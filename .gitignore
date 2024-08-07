@@ -1,1 +1,10 @@
-node_modules
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Ignore all SQLTools session files
+*.session.sql
+
+# Ignore Visual Studio Code settings
+.vscode/
