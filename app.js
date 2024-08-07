@@ -36,10 +36,13 @@ app.get('/events', async (req, res) => {
 // Function to add sample data
 const addSampleData = async () => {
   try {
-    await Event.create({ title: 'Event 1', description: 'Description for event 1', date: new Date() });
-    await Event.create({ title: 'Event 2', description: 'Description for event 2', date: new Date() });
-    await Event.create({ title: 'Event 3', description: 'Description for event 3', date: new Date() });
-    console.log('Sample data added successfully.');
+    const count = await Event.count();
+    if (count === 0) {
+      await Event.create({ title: 'Event 1', description: 'Description for event 1', date: new Date() });
+      await Event.create({ title: 'Event 2', description: 'Description for event 2', date: new Date() });
+      await Event.create({ title: 'Event 3', description: 'Description for event 3', date: new Date() });
+      console.log('Sample data added successfully.');
+    }
   } catch (error) {
     console.error('Error adding sample data:', error);
   }
@@ -47,8 +50,8 @@ const addSampleData = async () => {
 
 // Sync database and start server
 const PORT = process.env.PORT || 3000;
-sequelize.sync({ force: true }).then(async () => {
-  await addSampleData(); // Add sample data
+sequelize.sync().then(async () => {
+  await addSampleData(); // Add sample data if the database is empty
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
