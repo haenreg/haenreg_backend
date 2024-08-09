@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/database';
+import Organization from './Organizations';
 
 const User = sequelize.define('User', {
     username: {
@@ -10,10 +11,16 @@ const User = sequelize.define('User', {
         type: DataTypes.STRING,
         allowNull: false
     },
-    organization: {
+    organizationId: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        references: {
+            model: Organization,
+            key: 'id'
+        }
     }
+}, {
+    tableName: 'Users'
 });
 
 export default User;

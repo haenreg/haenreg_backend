@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import User from './models/Users';
+import Organization from './models/Organizations';
 
 const mockUsers = [
     {
@@ -20,6 +21,10 @@ const mockUsers = [
 ];
 
 export async function createMockUsers(): Promise<void> {
+    const orgCount = await Organization.count();
+    if (orgCount === 0) {
+        await createMockOrgs();
+    }
     for (const user of mockUsers) {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(user.password, salt);
@@ -28,7 +33,7 @@ export async function createMockUsers(): Promise<void> {
             await User.create({
                 username: user.username,
                 password: hashedPassword,
-                organization: user.org
+                organizationId: user.org
             });
             console.log(`User ${user.username} created successfully.`);
         } catch (error) {
@@ -36,3 +41,16 @@ export async function createMockUsers(): Promise<void> {
         }
     }
 }
+
+const createMockOrgs = async () => {
+    try {
+        await Organization.create( {
+            name: 'Østerbyskolen'
+        });
+        await Organization.create( {
+            name: 'Grønvangskolen'
+        })
+    } catch (error) {
+        console.error('Error creating organizations');
+    }
+};
