@@ -1,6 +1,5 @@
-// models/Event.js
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database';
 
 const Event = sequelize.define('Event', {
   title: {
@@ -17,4 +16,4 @@ const Event = sequelize.define('Event', {
   }
 });
 
-module.exports = Event;
+export default Event;

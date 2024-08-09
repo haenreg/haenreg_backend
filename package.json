@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "cross-env NODE_ENV=development nodemon app.js"
+    "start": "cross-env NODE_ENV=development nodemon app.ts"
   },
   "keywords": [],
   "author": "",
@@ -13,10 +13,14 @@
   "dependencies": {
     "body-parser": "^1.20.2",
     "cross-env": "^7.0.3",
+    "dotenv-flow": "^4.1.0",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^2.3.3",
     "nodemon": "^3.1.4",
     "sequelize": "^6.30.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21"
   }
 }

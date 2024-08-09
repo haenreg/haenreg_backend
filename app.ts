@@ -1,35 +1,38 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const sequelize = require('./config/database');
-const Event = require('./models/Events');
+import express, { Express, Request, Response } from 'express';
+import bodyParser from 'body-parser';
+import sequelize from './config/database';
+import Event from './models/Events';
+import dotenv from 'dotenv-flow';
 
-const app = express();
+dotenv.config();
+
+const app : Express = express();
 
 app.use(bodyParser.json());
 
 // Test route
-app.get('/', (req, res) => {
+app.get('/', (req: Request, res: Response) => {
   res.send('Hello World');
 });
 
 // Route to create an event
-app.post('/events', async (req, res) => {
+app.post('/events', async (req: Request, res: Response) => {
   const { title, description, date } = req.body;
   try {
     const event = await Event.create({ title, description, date });
     res.status(201).json(event);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: (error as Error).message });
   }
 });
 
 // Route to get all events
-app.get('/events', async (req, res) => {
+app.get('/events', async (req: Request, res: Response) => {
   try {
     const events = await Event.findAll();
     res.status(200).json(events);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: (error as Error).message });
   }
 });
 
@@ -38,9 +41,9 @@ const addSampleData = async () => {
   try {
     const count = await Event.count();
     if (count === 0) {
-      await Event.create({ title: 'Event 1', description: 'Description for event 1', date: new Date() });
+      /* await Event.create({ title: 'Event 1', description: 'Description for event 1', date: new Date() });
       await Event.create({ title: 'Event 2', description: 'Description for event 2', date: new Date() });
-      await Event.create({ title: 'Event 3', description: 'Description for event 3', date: new Date() });
+      await Event.create({ title: 'Event 3', description: 'Description for event 3', date: new Date() }); */
       console.log('Sample data added successfully.');
     }
   } catch (error) {
