@@ -3,7 +3,7 @@ import bodyParser from 'body-parser';
 import sequelize from './config/database';
 import User from './models/Users';
 import dotenv from 'dotenv-flow';
-import { createMockUsers } from './utility';
+import { generateMockData } from './utility';
 import userRoute from './routes/UserRoutes';
 
 dotenv.config();
@@ -21,10 +21,7 @@ app.get('/', (req: Request, res: Response) => {
 // Function to add sample data
 const addSampleData = async () => {
   try {
-    const userCount = await User.count();
-    if (userCount === 0) {
-        await createMockUsers();
-    }
+    await generateMockData();
   } catch (error) {
     console.error('Error adding sample data:', error);
   }

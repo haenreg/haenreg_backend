@@ -4,11 +4,11 @@ import Organization from './Organizations';
 
 const User = sequelize.define('User', {
     username: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
     },
     password: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
     },
     organizationId: {

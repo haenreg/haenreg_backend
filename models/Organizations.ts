@@ -3,7 +3,7 @@ import sequelize from '../config/database';
 
 const Organization = sequelize.define('Organization', {
     name: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
     }
 }, {
