@@ -2,5 +2,6 @@ export interface iAnswer {
     id?: number;
     caseId: number;
     questionId: number;
-    answer: string;
+    answer?: string;
+    choiceId?: number
 }

@@ -9,6 +9,7 @@ import { iQuestion, QuestionType } from './interfaces/iQuestion';
 import { iUser } from './interfaces/iUser';
 import { iOrganization } from './interfaces/iOrganization';
 import { iQuestionChoice } from './interfaces/iQuestionChoice';
+import { iAnswer } from './interfaces/iAnswer';
 import { iCase, CaseApproved } from './interfaces/iCase';
 
 const mockUsers: iUser[] = [
@@ -72,39 +73,54 @@ const mockQuestions: iQuestion[] = [
 
 const mockQuestionChoices: iQuestionChoice[] = [
     {
-        organizationId: 2,
+        questionId: 3,
+        choice: 'Foldboldbanen'
+    },
+    {
+        questionId: 3,
+        choice: 'Gangen'
+    },
+    {
+        questionId: 3,
+        choice: 'Klasseværelset'
+    },
+    {
         questionId: 4,
         choice: 'Skolegården'
     },
     {
-        organizationId: 2,
         questionId: 4,
         choice: 'Klasseværelset'
     },
     {
-        organizationId: 2,
         questionId: 4,
         choice: 'SFO\'en'
     },
     {
-        organizationId: 1,
         questionId: 5,
         choice: 'Spyt'
     },
     {
-        organizationId: 1,
         questionId: 5,
         choice: 'Spark'
     },
     {
-        organizationId: 1,
         questionId: 5,
         choice: 'Niven'
     },
     {
-        organizationId: 1,
         questionId: 5,
         choice: 'Kradsen'
+    },
+    {
+        questionId: 5,
+        choice: 'På arm',
+        dependantChoice: 7
+    },
+    {
+        questionId: 5,
+        choice: 'I hovedet',
+        dependantChoice: 7
     }
 ]
 
@@ -146,7 +162,116 @@ const mockCases: iCase[] = [
     },
 ]
 
-
+const mockAnswers: iAnswer[] = [
+    // Date answers (QuestionType.Date)
+    {
+        caseId: 1,
+        questionId: 1,
+        answer: '01-01-2024'
+    },
+    {
+        caseId: 2,
+        questionId: 2,
+        answer: '01-01-2024'
+    },
+    {
+        caseId: 3,
+        questionId: 1,
+        answer: '13-04-2024'
+    },
+    {
+        caseId: 4,
+        questionId: 1,
+        answer: '15-03-2024'
+    },
+    {
+        caseId: 5,
+        questionId: 1,
+        answer: '29-05-2024'
+    },
+    {
+        caseId: 6,
+        questionId: 1,
+        answer: '22-03-2024'
+    },
+    {
+        caseId: 7,
+        questionId: 2,
+        answer: '04-04-2024'
+    },
+    // Text answers (QuestionType.Text)
+    {
+        caseId: 1,
+        questionId: 3,
+        answer: 'Foldboldbanen'
+    },
+    {
+        caseId: 3,
+        questionId: 3,
+        answer: 'Klasseværelset'
+    },
+    {
+        caseId: 5,
+        questionId: 3,
+        answer: 'Gangen'
+    },
+    {
+        caseId: 7,
+        questionId: 3,
+        answer: 'Gangen'
+    },
+    // Choice answers (QuestionType.SelectOne or MultiSelect)
+    {
+        caseId: 2,
+        questionId: 4,
+        choiceId: 4 // Skolegården
+    },
+    {
+        caseId: 4,
+        questionId: 4,
+        choiceId: 6 // SFO'en
+    },
+    {
+        caseId: 6,
+        questionId: 4,
+        choiceId: 5 // Klasseværelset
+    },
+    {
+        caseId: 1,
+        questionId: 5,
+        choiceId: 8 // Spark
+    },
+    {
+        caseId: 2,
+        questionId: 5,
+        choiceId: 7 // Spyt
+    },
+    {
+        caseId: 3,
+        questionId: 5,
+        choiceId: 9 // Niven
+    },
+    {
+        caseId: 4,
+        questionId: 5,
+        choiceId: 10 // Kradsen
+    },
+    {
+        caseId: 5,
+        questionId: 5,
+        choiceId: 11 // På arm
+    },
+    {
+        caseId: 6,
+        questionId: 5,
+        choiceId: 12 // I hovedet
+    },
+    {
+        caseId: 7,
+        questionId: 5,
+        choiceId: 7 // Spyt
+    }
+];
 
 export async function generateMockData(): Promise<void> {
     const orgCount = await Organization.count();
@@ -237,9 +362,9 @@ const createMockQuestionChoices = async () => {
     for (const questionChoice of mockQuestionChoices) {
         try {
             await QuestionChoice.create({
-                organizationId: questionChoice.organizationId,
                 questionId: questionChoice.questionId,
-                choice: questionChoice.choice
+                choice: questionChoice.choice,
+                dependantChoice: questionChoice.dependantChoice
             });
         } catch (error) {
             console.error('Error creating question choices');
@@ -259,13 +384,19 @@ const createMockCases = async () => {
             console.error('Error creating cases');
         }
     }
-    
 };
 
 const createMockAnswers = async () => {
-    try {
-
+    for (const answer of mockAnswers) {
+        try {
+            await Answer.create({
+                caseId: answer.caseId,
+                questionId: answer.questionId,
+                answer: answer.answer,
+                choiceId: answer.choiceId
+            })
     } catch (error) {
         console.error('Error creating answers');
+    }
     }
 };

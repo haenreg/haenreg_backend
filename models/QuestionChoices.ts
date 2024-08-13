@@ -4,14 +4,6 @@ import Organization from './Organizations';
 import Question from './Questions';
 
 const QuestionChoice = sequelize.define('QuestionChoice', {
-    organizationId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: Organization,
-            key: 'id'
-        }
-    },
     questionId: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -23,9 +15,19 @@ const QuestionChoice = sequelize.define('QuestionChoice', {
     choice: {
         type: DataTypes.TEXT,
         allowNull: false
+    },
+    dependantChoice: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+            model: 'QuestionChoices',
+            key: 'id'
+        }
     }
 }, {
     tableName: 'QuestionChoices'
 });
+
+QuestionChoice.belongsTo(QuestionChoice, { as: 'Dependent', foreignKey: 'dependantChoice' });
 
 export default QuestionChoice;

@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/database';
 import Question from './Questions';
+import QuestionChoice from './QuestionChoices';
 import Case from './Cases';
 
 const Answer = sequelize.define('Answer', {
@@ -22,7 +23,15 @@ const Answer = sequelize.define('Answer', {
     },
     answer: {
         type: DataTypes.TEXT,
-        allowNull: false
+        allowNull: true
+    },
+    choiceId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+            model: QuestionChoice,
+            key: 'id'
+        }
     }
 }, {
     tableName: 'Answers'
