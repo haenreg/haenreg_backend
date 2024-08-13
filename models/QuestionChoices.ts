@@ -1,6 +1,5 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/database';
-import Organization from './Organizations';
 import Question from './Questions';
 
 const QuestionChoice = sequelize.define('QuestionChoice', {

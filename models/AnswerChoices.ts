@@ -1,31 +1,27 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/database';
-import Case from './Cases';
-import Question from './Questions';
+import Answer from './Answers';
+import QuestionChoice from './QuestionChoices';
 
-const Answer = sequelize.define('Answer', {
-    caseId: {
+const AnswerChoices = sequelize.define('AnswerChoices', {
+    answerId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: Case,
+            model: Answer,
             key: 'id'
         }
     },
-    questionId: {
+    choiceId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: Question,
+            model: QuestionChoice,
             key: 'id'
         }
-    },
-    answer: {
-        type: DataTypes.TEXT,
-        allowNull: true
     }
 }, {
-    tableName: 'Answers'
+    tableName: 'AnswerChoices'
 });
 
-export default Answer;
+export default AnswerChoices;
