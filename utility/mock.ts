@@ -1,18 +1,18 @@
 import bcrypt from 'bcrypt';
-import User from './models/Users';
-import Organization from './models/Organizations';
-import Question from './models/Questions';
-import QuestionChoice from './models/QuestionChoices';
-import Case from './models/Cases';
-import Answer from './models/Answers';
-import { iQuestion, QuestionType } from './interfaces/iQuestion';
-import { iUser } from './interfaces/iUser';
-import { iOrganization } from './interfaces/iOrganization';
-import { iQuestionChoice } from './interfaces/iQuestionChoice';
-import { iAnswer } from './interfaces/iAnswer';
-import { iAnswerChoice } from './interfaces/iAnswerChoices';
-import { iCase, CaseApproved } from './interfaces/iCase';
-import AnswerChoice from './models/AnswerChoices';
+import User from '../models/Users';
+import Organization from '../models/Organizations';
+import Question from '../models/Questions';
+import QuestionChoice from '../models/QuestionChoices';
+import Case from '../models/Cases';
+import Answer from '../models/Answers';
+import { iQuestion, QuestionType } from '../interfaces/iQuestion';
+import { iUser } from '../interfaces/iUser';
+import { iOrganization } from '../interfaces/iOrganization';
+import { iQuestionChoice } from '../interfaces/iQuestionChoice';
+import { iAnswer } from '../interfaces/iAnswer';
+import { iAnswerChoice } from '../interfaces/iAnswerChoices';
+import { iCase, CaseApproved } from '../interfaces/iCase';
+import AnswerChoice from '../models/AnswerChoices';
 
 const mockUsers: iUser[] = [
     {
@@ -29,7 +29,19 @@ const mockUsers: iUser[] = [
         username: 'lone',
         password: '321drowssap',
         organizationId: 1
-    }
+    },
+    {
+        username: 'bente',
+        password: 'password123',
+        organizationId: 1,
+        isOrgLeader: true
+    },
+    {
+        username: 'kurt',
+        password: 'password123',
+        organizationId: 2,
+        isOrgLeader: true
+    },
 ];
 
 const mockOrganizations: iOrganization[] = [
@@ -364,7 +376,8 @@ const createMockUsers = async () => {
             await User.create({
                 username: user.username,
                 password: hashedPassword,
-                organizationId: user.organizationId
+                organizationId: user.organizationId,
+                isOrgLeader: user.isOrgLeader
             });
         } catch (error) {
             console.error(`Error creating user ${user.username}:`, error);

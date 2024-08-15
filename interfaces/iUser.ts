@@ -3,4 +3,5 @@ export interface iUser {
     username: string;
     password?: string;
     organizationId: number;
+    isOrgLeader?: boolean;
 }

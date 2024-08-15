@@ -28,4 +28,11 @@ const Answer = sequelize.define('Answer', {
     tableName: 'Answers'
 });
 
+// Define relationships with aliases
+Answer.belongsTo(Case, { foreignKey: 'caseId', as: 'case' });
+Case.hasMany(Answer, { foreignKey: 'caseId', as: 'answers' }); // Alias as 'answers'
+
+Answer.belongsTo(Question, { foreignKey: 'questionId', as: 'question' });
+Question.hasMany(Answer, { foreignKey: 'questionId', as: 'answers' }); // Alias as 'answers'
+
 export default Answer;
