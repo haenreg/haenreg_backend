@@ -30,11 +30,11 @@ const AnswerChoice = sequelize.define('AnswerChoices', {
     ]
 });
 
-// Define relationships
-AnswerChoice.belongsTo(Answer, { foreignKey: 'answerId' });
-Answer.hasMany(AnswerChoice, { foreignKey: 'answerId' });
+// Define relationships with aliases
+AnswerChoice.belongsTo(Answer, { foreignKey: 'answerId', as: 'answer' });
+Answer.hasMany(AnswerChoice, { foreignKey: 'answerId', as: 'answerChoices' }); // Alias as 'answerChoices'
 
-AnswerChoice.belongsTo(QuestionChoice, { foreignKey: 'choiceId' });
-QuestionChoice.hasMany(AnswerChoice, { foreignKey: 'choiceId' });
+AnswerChoice.belongsTo(QuestionChoice, { foreignKey: 'choiceId', as: 'questionChoice' });
+QuestionChoice.hasMany(AnswerChoice, { foreignKey: 'choiceId', as: 'answerChoices' }); // Alias as 'answerChoices'
 
 export default AnswerChoice;

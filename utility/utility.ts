@@ -10,18 +10,22 @@ export function getCaseQueryConfig(): { attributes: string[], include: IncludeOp
         include: [
             {
                 model: Answer,
+                as: 'answers',
                 attributes: ['id', 'answer'],
                 include: [
                     {
                         model: Question,
+                        as: 'question',
                         attributes: ['id', 'title', 'description', 'type'],
                     },
                     {
                         model: AnswerChoice,
+                        as: 'answerChoices',
                         attributes: ['id'],
                         include: [
                             {
                                 model: QuestionChoice,
+                                as: 'questionChoice',
                                 attributes: ['id', 'choice'],
                                 include: [
                                     {
