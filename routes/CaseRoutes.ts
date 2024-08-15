@@ -73,6 +73,7 @@ router.get('/create-new-case', authenticateToken,  async (req: Request, res: Res
 
     res.status(200).json({ message: 'Case created successfully', caseId: caseId });
   } catch (error) {
+    await transaction.rollback();
     res.status(500).json({ error: (error as Error).message });
   }
 });
