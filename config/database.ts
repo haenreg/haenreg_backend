@@ -1,10 +1,12 @@
-// config/database.js
-const { Sequelize } = require('sequelize');
+import { Sequelize } from 'sequelize';
+import dotenv from 'dotenv-flow';
+
+dotenv.config();
 
 const sequelize = new Sequelize(
-  'mydatabase',   // Database name
-  'user',         // Database username
-  'userpassword', // Database password
+  process.env.DB_NAME as string,   // Database name
+  process.env.DB_USERNAME as string, // Database username
+  process.env.DB_USER_PASSWORD as string, // Database password
   {
     host: 'localhost', // Docker container host
     dialect: 'mysql',
@@ -17,7 +19,8 @@ sequelize.authenticate()
     console.log('Connection has been established successfully.');
   })
   .catch(err => {
+    console.log(process.env.DB_NAME);
     console.error('Unable to connect to the database:', err);
   });
 
-module.exports = sequelize;
+export default sequelize;

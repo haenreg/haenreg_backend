@@ -8,3 +8,4 @@ yarn-error.log
 
 # Ignore Visual Studio Code settings
 .vscode/
+.env.development
