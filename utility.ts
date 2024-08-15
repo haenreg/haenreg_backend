@@ -10,7 +10,9 @@ import { iUser } from './interfaces/iUser';
 import { iOrganization } from './interfaces/iOrganization';
 import { iQuestionChoice } from './interfaces/iQuestionChoice';
 import { iAnswer } from './interfaces/iAnswer';
+import { iAnswerChoice } from './interfaces/iAnswerChoices';
 import { iCase, CaseApproved } from './interfaces/iCase';
+import AnswerChoice from './models/AnswerChoices';
 
 const mockUsers: iUser[] = [
     {
@@ -19,12 +21,12 @@ const mockUsers: iUser[] = [
         organizationId: 1
     },
     {
-        username: 'anders',
+        username: 'yvonne',
         password: 'password321',
         organizationId: 2
     },
     {
-        username: 'lotte',
+        username: 'lone',
         password: '321drowssap',
         organizationId: 1
     }
@@ -223,55 +225,88 @@ const mockAnswers: iAnswer[] = [
     // Choice answers (QuestionType.SelectOne or MultiSelect)
     {
         caseId: 2,
-        questionId: 4,
-        choiceId: 4 // Skolegården
+        questionId: 4
     },
     {
         caseId: 4,
-        questionId: 4,
-        choiceId: 6 // SFO'en
+        questionId: 4
     },
     {
         caseId: 6,
-        questionId: 4,
-        choiceId: 5 // Klasseværelset
+        questionId: 4
     },
     {
         caseId: 1,
-        questionId: 5,
-        choiceId: 8 // Spark
+        questionId: 5
     },
     {
         caseId: 2,
-        questionId: 5,
-        choiceId: 7 // Spyt
+        questionId: 5
     },
     {
         caseId: 3,
-        questionId: 5,
-        choiceId: 9 // Niven
+        questionId: 5
     },
     {
         caseId: 4,
-        questionId: 5,
-        choiceId: 10 // Kradsen
+        questionId: 5
     },
     {
         caseId: 5,
-        questionId: 5,
-        choiceId: 11 // På arm
+        questionId: 5
     },
     {
         caseId: 6,
-        questionId: 5,
-        choiceId: 12 // I hovedet
+        questionId: 5
     },
     {
         caseId: 7,
-        questionId: 5,
-        choiceId: 7 // Spyt
+        questionId: 5
     }
 ];
+
+const mockAnswerChoices: iAnswerChoice[] = [
+    {
+        answerId: 12,
+        choiceId: 4 // Skolegården
+    },
+    {
+        answerId: 13,
+        choiceId: 6 // SFO'en
+    },
+    {
+        answerId: 14,
+        choiceId: 5 // Klasseværelset
+    },
+    {
+        answerId: 15,
+        choiceId: 8 // Spark
+    },
+    {
+        answerId: 16,
+        choiceId: 7 // Spyt
+    },
+    {
+        answerId: 17,
+        choiceId: 9 // Niven
+    },
+    {
+        answerId: 18,
+        choiceId: 10 // Kradsen
+    },
+    {
+        answerId: 19,
+        choiceId: 11 // På arm
+    },
+    {
+        answerId: 20,
+        choiceId: 12 // I hovedet
+    },
+    {
+        answerId: 21,
+        choiceId: 7 // Spyt
+    }
+]
 
 export async function generateMockData(): Promise<void> {
     const orgCount = await Organization.count();
@@ -308,6 +343,12 @@ export async function generateMockData(): Promise<void> {
     if (answerCount === 0) {
         await createMockAnswers();
         console.log('Created mocked answers!');
+    }
+
+    const answerChoiceCount = await AnswerChoice.count();
+    if (answerChoiceCount === 0) {
+        await createMockAnswerChoices();
+        console.log('Created mocked answer choices!');
     }
 }
 
@@ -392,11 +433,23 @@ const createMockAnswers = async () => {
             await Answer.create({
                 caseId: answer.caseId,
                 questionId: answer.questionId,
-                answer: answer.answer,
-                choiceId: answer.choiceId
+                answer: answer.answer
             })
     } catch (error) {
         console.error('Error creating answers');
+    }
+    }
+};
+
+const createMockAnswerChoices = async () => {
+    for (const answerChoice of mockAnswerChoices) {
+        try {
+            await AnswerChoice.create({
+                answerId: answerChoice.answerId,
+                choiceId: answerChoice.choiceId
+            })
+    } catch (error) {
+        console.error('Error creating answer choices');
     }
     }
 };
