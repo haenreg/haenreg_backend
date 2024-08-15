@@ -18,6 +18,11 @@ const User = sequelize.define('User', {
             model: Organization,
             key: 'id'
         }
+    },
+    isOrgLeader: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
     }
 }, {
     tableName: 'Users'

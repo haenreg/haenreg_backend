@@ -1,9 +1,10 @@
 import User from '../models/Users';
 import express, { Router, Request, Response } from 'express';
-import { loginValidation } from '../validation/auth';
+import { authenticateToken, verifyIsLeader } from '../validation/auth';
 import bcrypt from 'bcrypt';
 import { iUser } from '../interfaces/iUser';
 import jwt from 'jsonwebtoken';
+import { loginValidation } from '../validation/validation';
 
 const router = Router();
 
@@ -11,7 +12,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'jwt_secret_key';
 const JWT_EXPIRES = process.env.JWT_EXPIRES || '1h';
 
 // Route to get all events
-router.get('/get-all', async (req: Request, res: Response) => {
+router.get('/get-all', verifyIsLeader,  async (req: Request, res: Response) => {
   try {
     const users = await User.findAll();
     res.status(200).json(users);
@@ -24,8 +25,6 @@ router.post('/login', async (req, res) => {
   try {
 
     const data = req.body;
-    console.log(data);
-    
 
     const { error } = loginValidation(data);
 
@@ -47,8 +46,18 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Invalid username or password' });
     }
 
+    const jwtData: iUser = { 
+      id: user.id,
+      username: user.username,
+      organizationId: user.organizationId
+    };
+
+    if (user.isOrgLeader) {
+      jwtData.isOrgLeader = true;
+    }
+
     const token = jwt.sign(
-      { id: user.id, username: user.username, organizationId: user.organizationId },
+      jwtData,
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES }
     );

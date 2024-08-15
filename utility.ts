@@ -29,7 +29,19 @@ const mockUsers: iUser[] = [
         username: 'lone',
         password: '321drowssap',
         organizationId: 1
-    }
+    },
+    {
+        username: 'bente',
+        password: 'password123',
+        organizationId: 1,
+        isOrgLeader: true
+    },
+    {
+        username: 'kurt',
+        password: 'password123',
+        organizationId: 2,
+        isOrgLeader: true
+    },
 ];
 
 const mockOrganizations: iOrganization[] = [
@@ -364,7 +376,8 @@ const createMockUsers = async () => {
             await User.create({
                 username: user.username,
                 password: hashedPassword,
-                organizationId: user.organizationId
+                organizationId: user.organizationId,
+                isOrgLeader: user.isOrgLeader
             });
         } catch (error) {
             console.error(`Error creating user ${user.username}:`, error);
