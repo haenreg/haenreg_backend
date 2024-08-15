@@ -25,12 +25,12 @@ router.post('/create-new-case', authenticateToken,  async (req: Request, res: Re
     const { error } = createCaseValidation(req.body);
 
     if (error) {
-        await transaction.rollback();
+      await transaction.rollback();
       return res.status(400).json({ error: error.details.map(d => d.message).join(', ') });
     }
 
     if (!req.user) {
-        return res.status(400).json({ message: 'No user found' });
+      return res.status(400).json({ message: 'No user found' });
     }
     
     const userId = req.user.id;
@@ -75,6 +75,74 @@ router.post('/create-new-case', authenticateToken,  async (req: Request, res: Re
     await transaction.commit();
 
     res.status(200).json({ message: 'Case created successfully', caseId: caseId });
+  } catch (error) {
+    await transaction.rollback();
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+router.post('/update-case/:caseId', authenticateToken, async (req: Request, res: Response) => {
+  const transaction = await sequelize.transaction();
+  try {
+    const userId = req.user?.id;
+    const { caseId } = req.params;
+
+    const { error } = createCaseValidation(req.body);
+
+    if (error) {
+      await transaction.rollback();
+      return res.status(400).json({ error: error.details.map(d => d.message).join(', ') });
+    }
+
+    let caseToEdit = await Case.findOne({
+       where: { id: caseId, userId: userId}
+    });
+
+    if (!caseToEdit) {
+      await transaction.rollback();
+      return res.status(400).json({ message: 'No case found' });
+    }
+
+    const changedAnswers = req.body;
+    
+    for (const caseItem of changedAnswers) {
+      const { question, answer } = caseItem;
+
+      await Answer.update(
+        { answer: answer.answer || null },
+        {
+          where: {
+            caseId: caseId,
+            questionId: question
+          },
+          transaction
+        }
+      );
+
+      if (answer.choice) {
+        const answerInstance = await Answer.findOne({
+          where: { caseId: caseId, questionId: question },
+          transaction
+        }) as unknown as typeof Answer & { id: number };
+
+        if (answerInstance) {
+          await AnswerChoice.update(
+            {
+              choiceId: answer.choice,
+            },
+            {
+              where: {
+                answerId: answerInstance.id, // Use the correctly typed id here
+              },
+              transaction
+            }
+          );
+        }
+      }
+    }
+
+    await transaction.commit();
+    return res.status(200).json({ message: 'Case updated successfully' });
   } catch (error) {
     await transaction.rollback();
     res.status(500).json({ error: (error as Error).message });
