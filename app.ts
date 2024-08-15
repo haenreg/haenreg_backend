@@ -6,6 +6,7 @@ import dotenv from 'dotenv-flow';
 import { generateMockData } from './utility/mock';
 import userRoute from './routes/UserRoutes';
 import caseRoute from './routes/CaseRoutes';
+import questionRoute from './routes/QuestionRoutes';
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ const app : Express = express();
 app.use(bodyParser.json());
 app.use('/api/users', userRoute);
 app.use('/api/cases', caseRoute);
+app.use('/api/questions', questionRoute);
 
 // Test route
 app.get('/', (req: Request, res: Response) => {

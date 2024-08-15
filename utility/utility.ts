@@ -26,7 +26,7 @@ export function getCaseQueryConfig(): { attributes: string[], include: IncludeOp
                                 include: [
                                     {
                                         model: QuestionChoice,
-                                        as: 'Dependent',
+                                        as: 'dependent',
                                         attributes: ['id', 'choice'],
                                     }
                                 ]
