@@ -3,7 +3,7 @@ import bodyParser from 'body-parser';
 import sequelize from './config/database';
 import User from './models/Users';
 import dotenv from 'dotenv-flow';
-import { generateMockData } from './utility';
+import { generateMockData } from './utility/mock';
 import userRoute from './routes/UserRoutes';
 import caseRoute from './routes/CaseRoutes';
 

@@ -1,18 +1,18 @@
 import bcrypt from 'bcrypt';
-import User from './models/Users';
-import Organization from './models/Organizations';
-import Question from './models/Questions';
-import QuestionChoice from './models/QuestionChoices';
-import Case from './models/Cases';
-import Answer from './models/Answers';
-import { iQuestion, QuestionType } from './interfaces/iQuestion';
-import { iUser } from './interfaces/iUser';
-import { iOrganization } from './interfaces/iOrganization';
-import { iQuestionChoice } from './interfaces/iQuestionChoice';
-import { iAnswer } from './interfaces/iAnswer';
-import { iAnswerChoice } from './interfaces/iAnswerChoices';
-import { iCase, CaseApproved } from './interfaces/iCase';
-import AnswerChoice from './models/AnswerChoices';
+import User from '../models/Users';
+import Organization from '../models/Organizations';
+import Question from '../models/Questions';
+import QuestionChoice from '../models/QuestionChoices';
+import Case from '../models/Cases';
+import Answer from '../models/Answers';
+import { iQuestion, QuestionType } from '../interfaces/iQuestion';
+import { iUser } from '../interfaces/iUser';
+import { iOrganization } from '../interfaces/iOrganization';
+import { iQuestionChoice } from '../interfaces/iQuestionChoice';
+import { iAnswer } from '../interfaces/iAnswer';
+import { iAnswerChoice } from '../interfaces/iAnswerChoices';
+import { iCase, CaseApproved } from '../interfaces/iCase';
+import AnswerChoice from '../models/AnswerChoices';
 
 const mockUsers: iUser[] = [
     {

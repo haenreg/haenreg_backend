@@ -1,7 +1,6 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/database';
 import Organization from './Organizations';
-import QuestionChoice from './QuestionChoices';
 
 const Question = sequelize.define('Question', {
     organizationId: {
@@ -27,5 +26,9 @@ const Question = sequelize.define('Question', {
 }, {
     tableName: 'Questions'
 });
+
+// Define relationships
+Question.belongsTo(Organization, { foreignKey: 'organizationId' });
+Organization.hasMany(Question, { foreignKey: 'organizationId' });
 
 export default Question;

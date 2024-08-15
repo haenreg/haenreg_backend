@@ -27,6 +27,10 @@ const QuestionChoice = sequelize.define('QuestionChoice', {
     tableName: 'QuestionChoices'
 });
 
+// Define relationships
+QuestionChoice.belongsTo(Question, { foreignKey: 'questionId' });
+Question.hasMany(QuestionChoice, { foreignKey: 'questionId' });
+
 QuestionChoice.belongsTo(QuestionChoice, { as: 'Dependent', foreignKey: 'dependantChoice' });
 
 export default QuestionChoice;

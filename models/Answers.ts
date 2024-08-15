@@ -28,4 +28,11 @@ const Answer = sequelize.define('Answer', {
     tableName: 'Answers'
 });
 
+// Define relationships
+Answer.belongsTo(Case, { foreignKey: 'caseId' });
+Case.hasMany(Answer, { foreignKey: 'caseId' });
+
+Answer.belongsTo(Question, { foreignKey: 'questionId' });
+Question.hasMany(Answer, { foreignKey: 'questionId' });
+
 export default Answer;

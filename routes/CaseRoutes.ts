@@ -7,16 +7,19 @@ import Case from '../models/Cases';
 import Answer from '../models/Answers';
 import AnswerChoice from '../models/AnswerChoices';
 import { CaseApproved } from '../interfaces/iCase';
+import Question from '../models/Questions';
+import QuestionChoice from '../models/QuestionChoices';
+import { getCaseQueryConfig } from '../utility/utility';
 
 const router = Router();
 
 declare module 'express-serve-static-core' {
   interface Request {
-    user?: iUser; // Now TypeScript knows that req.user is of type iUser
+    user?: iUser;
   }
 }
 
-router.get('/create-new-case', authenticateToken,  async (req: Request, res: Response) => {
+router.post('/create-new-case', authenticateToken,  async (req: Request, res: Response) => {
     const transaction = await sequelize.transaction();
   try {
     const { error } = createCaseValidation(req.body);
@@ -77,5 +80,56 @@ router.get('/create-new-case', authenticateToken,  async (req: Request, res: Res
     res.status(500).json({ error: (error as Error).message });
   }
 });
+
+router.get('/get-cases-by-user', authenticateToken, async (req: Request, res: Response) => {
+    try {
+        const userId = req.user?.id; // Get user ID from the authenticated user
+
+        // Fetch cases for the given user, including associated answers, questions, and choices
+        const caseQueryConfig = getCaseQueryConfig();
+        const cases = await Case.findAll({
+            where: { userId },
+            ...caseQueryConfig
+        });
+
+
+        res.status(200).json(cases);
+    } catch (error) {
+        res.status(500).json({ error: (error as Error).message });
+    }
+});
+
+router.get('/get-case/:caseId', authenticateToken, async (req: Request, res: Response) => {
+    try {
+        const userId = req.user?.id;
+        const isUserLeader = req.user?.isOrgLeader;
+
+        const { caseId } = req.params;
+
+        const caseQueryConfig = getCaseQueryConfig();
+
+        let _case;
+
+        if (!isUserLeader) {
+            _case = await Case.findOne({
+                where: { id: caseId, userId: userId},
+                ...caseQueryConfig
+            });
+        } else {
+            _case = await Case.findOne({
+                where: { id: caseId},
+                ...caseQueryConfig
+            });
+        }
+
+        if (!_case) {
+            return res.status(400).json({ message: 'No case found' });
+        }
+
+        res.status(200).json(_case);
+    } catch (error) {
+        res.status(500).json({ error: (error as Error).message });
+    }
+})
 
 export default router;

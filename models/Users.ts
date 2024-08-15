@@ -28,4 +28,8 @@ const User = sequelize.define('User', {
     tableName: 'Users'
 });
 
+// Define the relationship between User and Organization
+User.belongsTo(Organization, { foreignKey: 'organizationId' });
+Organization.hasMany(User, { foreignKey: 'organizationId' });
+
 export default User;
