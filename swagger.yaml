@@ -165,6 +165,48 @@ components:
                   id: 1
                   choice: "Fysisk"
                   dependent: null
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          description: The username of the user
+        password:
+          type: string
+          description: The password of the user
+      required:
+        - username
+        - password
+      example:
+        username: "testuser"
+        password: "password123"
+
+    LoginResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Login successful
+        token:
+          type: string
+          description: JWT token to be used for authenticated requests
+
+    LoginErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Invalid username or password
+
+    LoginServerErrorResponse:
+      type: object
+      properties:
+        Title:
+          type: string
+          example: Something went wrong when logging in
+        Message:
+          type: string
+          example: "Error details here"
 tags:
   - name: case
   - name: question
@@ -315,6 +357,37 @@ paths:
           description: Unauthorized - Invalid or missing JWT token
         "500":
           description: Internal Server Error
+
+  /users/login:
+    post:
+      tags:
+        - user
+      summary: Authenticate a user and return a JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "400":
+          description: Bad Request - Invalid username or password
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginServerErrorResponse"
 
 security:
   - bearerAuth: []
