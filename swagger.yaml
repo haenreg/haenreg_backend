@@ -1,0 +1,320 @@
+openapi: 3.0.3
+info:
+  title: Swagger Haenreg
+  description: MYSQL Sequelize ExpressJS NodeJS REST API
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api/
+    description: Localhost development server
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT # Optional, just for documentation purposes
+  schemas:
+    Answer:
+      type: object
+      properties:
+        answer:
+          type: string
+          description: The text answer to the question
+        choice:
+          type: integer
+          description: The ID of the choice selected
+      example:
+        answer: "15-08-2024"
+
+    CaseItem:
+      type: object
+      properties:
+        question:
+          type: integer
+          description: The ID of the question being answered
+        answer:
+          $ref: "#/components/schemas/Answer"
+      required:
+        - question
+        - answer
+      example:
+        question: 1
+        answer:
+          answer: "15-08-2024"
+
+    UpdateCaseRequest:
+      type: array
+      items:
+        $ref: "#/components/schemas/CaseItem"
+      example:
+        - question: 1
+          answer:
+            answer: "01-01-2024"
+        - question: 3
+          answer:
+            answer: "Rema 1000"
+        - question: 5
+          answer:
+            choice: 8
+
+    CreateCaseRequest:
+      type: array
+      items:
+        $ref: "#/components/schemas/CaseItem"
+      example:
+        - question: 1
+          answer:
+            answer: "15-08-2024"
+        - question: 3
+          answer:
+            answer: "Supermarkedet"
+        - question: 5
+          answer:
+            choice: 7
+    CaseResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The ID of the case
+        approved:
+          type: string
+          description: The approval status of the case
+        answers:
+          type: array
+          description: List of answers associated with the case
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: The ID of the answer
+              answer:
+                type: string
+                description: The answer text
+              question:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: The ID of the question
+                  title:
+                    type: string
+                    description: The title of the question
+                  description:
+                    type: string
+                    description: The description of the question
+                  type:
+                    type: string
+                    description: The type of the question
+              answerChoices:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: The ID of the answer choice
+                    questionChoice:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: The ID of the question choice
+                        choice:
+                          type: string
+                          description: The choice text
+                        dependent:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              description: The ID of the dependent question choice
+                            choice:
+                              type: string
+                              description: The choice text
+      example:
+        id: 123
+        approved: "Waiting"
+        answers:
+          - id: 1
+            answer: "15-08-2024"
+            question:
+              id: 1
+              title: "What is your birthdate?"
+              description: "Please provide your birthdate."
+              type: "date"
+            answerChoices: []
+          - id: 2
+            answer: "Rema 1000"
+            question:
+              id: 3
+              title: "Where do you shop?"
+              description: "Please specify the place where you usually shop."
+              type: "text"
+            answerChoices: []
+          - id: 3
+            answer: null
+            question:
+              id: 5
+              title: "What is your preferred grocery store?"
+              description: "Select your preferred store."
+              type: "choice"
+            answerChoices:
+              - id: 1
+                questionChoice:
+                  id: 1
+                  choice: "Supermarkedet"
+                  dependent: null
+tags:
+  - name: case
+  - name: question
+  - name: user
+    description: Operations about user
+paths:
+  /cases/create-new-case:
+    post:
+      tags:
+        - case
+      summary: Create a new case with answers
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCaseRequest"
+      responses:
+        "200":
+          description: Case created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Case created successfully
+                  caseId:
+                    type: integer
+                    example: 123
+        "400":
+          description: Bad Request - Invalid input or no user found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Validation error: Question ID is required"
+        "401":
+          description: Unauthorized - Invalid or missing JWT token
+        "500":
+          description: Internal Server Error
+
+  /cases/update-case/{caseId}:
+    post:
+      tags:
+        - case
+      summary: Update an existing case with new answers
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          description: The ID of the case to update
+          schema:
+            type: integer
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCaseRequest"
+      responses:
+        "200":
+          description: Case updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Case updated successfully
+        "400":
+          description: Bad Request - Invalid input or no case found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Validation error: Question ID is required"
+        "401":
+          description: Unauthorized - Invalid or missing JWT token
+        "500":
+          description: Internal Server Error
+
+  /cases/get-case/{caseId}:
+    get:
+      tags:
+        - case
+      summary: Get a specific case by its ID
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          description: The ID of the case to retrieve
+          schema:
+            type: integer
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Case retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CaseResponse"
+        "400":
+          description: Bad Request - No case found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: No case found
+        "401":
+          description: Unauthorized - Invalid or missing JWT token
+        "500":
+          description: Internal Server Error
+
+  /cases/get-cases-by-user:
+    get:
+      tags:
+        - case
+      summary: Get cases for the authenticated user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of cases retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CaseResponse"
+        "401":
+          description: Unauthorized - Invalid or missing JWT token
+        "500":
+          description: Internal Server Error
+
+security:
+  - bearerAuth: []
