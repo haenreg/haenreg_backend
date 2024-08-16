@@ -7,15 +7,23 @@ import { generateMockData } from './utility/mock';
 import userRoute from './routes/UserRoutes';
 import caseRoute from './routes/CaseRoutes';
 import questionRoute from './routes/QuestionRoutes';
+import swaggerUi from 'swagger-ui-express';
+import yaml from 'js-yaml';
+import path from 'path';
+import fs from 'fs';
 
 dotenv.config();
 
 const app : Express = express();
 
+const swaggerPath = path.join(__dirname, 'swagger.yaml');
+const swaggerFile = yaml.load(fs.readFileSync(swaggerPath, 'utf8'));
+
 app.use(bodyParser.json());
 app.use('/api/users', userRoute);
 app.use('/api/cases', caseRoute);
 app.use('/api/questions', questionRoute);
+app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 // Test route
 app.get('/', (req: Request, res: Response) => {
