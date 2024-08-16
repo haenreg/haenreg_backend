@@ -207,6 +207,98 @@ components:
         Message:
           type: string
           example: "Error details here"
+
+    QuestionChoice:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The ID of the question choice
+        choice:
+          type: string
+          description: The text of the choice
+        dependent:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: The ID of the dependent question choice
+              choice:
+                type: string
+                description: The text of the dependent choice
+      example:
+        id: 7
+        choice: "Spyt"
+        dependent:
+          - id: 11
+            choice: "På arm"
+          - id: 12
+            choice: "I hovedet"
+
+    QuestionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The ID of the question
+        title:
+          type: string
+          description: The title of the question
+        description:
+          type: string
+          description: The description of the question
+        type:
+          type: string
+          description: The type of the question
+        questionChoices:
+          type: array
+          description: List of choices associated with the question
+          items:
+            $ref: "#/components/schemas/QuestionChoice"
+      example:
+        - id: 1
+          title: "Dato"
+          description: "Dato på hændelsen"
+          type: "DATE"
+          questionChoices: []
+        - id: 3
+          title: "Lokation"
+          description: "Hvor skete hændelsen"
+          type: "TEXT"
+          questionChoices:
+            - id: 1
+              choice: "Foldboldbanen"
+              dependent: []
+            - id: 2
+              choice: "Gangen"
+              dependent: []
+            - id: 3
+              choice: "Klasseværelset"
+              dependent: []
+        - id: 5
+          title: "Type"
+          description: "Hvilken slags hændelse var det"
+          type: "MULTI_SELECT"
+          questionChoices:
+            - id: 7
+              choice: "Spyt"
+              dependent:
+                - id: 11
+                  choice: "På arm"
+                - id: 12
+                  choice: "I hovedet"
+            - id: 8
+              choice: "Spark"
+              dependent: []
+            - id: 9
+              choice: "Niven"
+              dependent: []
+            - id: 10
+              choice: "Kradsen"
+              dependent: []
+
 tags:
   - name: case
   - name: question
@@ -388,6 +480,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/LoginServerErrorResponse"
+
+  /questions/get-questions:
+    get:
+      tags:
+        - question
+      summary: Get all questions for the authenticated user's organization
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of questions retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/QuestionResponse"
+        "401":
+          description: Unauthorized - Invalid or missing JWT token
+        "500":
+          description: Internal Server Error
 
 security:
   - bearerAuth: []
