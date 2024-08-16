@@ -140,30 +140,30 @@ components:
             answer: "15-08-2024"
             question:
               id: 1
-              title: "What is your birthdate?"
-              description: "Please provide your birthdate."
+              title: "Dato"
+              description: "Hvornår skete hændelsen?"
               type: "date"
             answerChoices: []
           - id: 2
-            answer: "Rema 1000"
+            answer: "Klasseværelet"
             question:
               id: 3
-              title: "Where do you shop?"
-              description: "Please specify the place where you usually shop."
+              title: "Lokation"
+              description: "Hvor henne skete hændelsen?"
               type: "text"
             answerChoices: []
           - id: 3
             answer: null
             question:
               id: 5
-              title: "What is your preferred grocery store?"
-              description: "Select your preferred store."
+              title: "Type"
+              description: "Hvilken slags type var hændelsen?"
               type: "choice"
             answerChoices:
               - id: 1
                 questionChoice:
                   id: 1
-                  choice: "Supermarkedet"
+                  choice: "Fysisk"
                   dependent: null
 tags:
   - name: case
