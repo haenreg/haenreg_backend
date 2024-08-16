@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "cross-env NODE_ENV=development nodemon app.ts",
-    "swagger-autogen": "node swagger.js"
+    "start": "cross-env NODE_ENV=development nodemon app.ts"
   },
   "keywords": [],
   "author": "",
@@ -24,7 +23,6 @@
     "mysql2": "^2.3.3",
     "nodemon": "^3.1.4",
     "sequelize": "^6.30.0",
-    "swagger-autogen": "^2.23.7",
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
