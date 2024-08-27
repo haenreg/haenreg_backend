@@ -41,7 +41,7 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Invalid username or password' });
     }
 
-    const org = await Organization.findByPk(user.id) as any;
+    const org = await Organization.findByPk(user.organizationId) as any;
 
     // Compare the provided password with the stored hash
     const validPassword = await bcrypt.compare(password, user.password);
