@@ -5,6 +5,7 @@ import bcrypt from 'bcrypt';
 import { iUser } from '../interfaces/iUser';
 import jwt from 'jsonwebtoken';
 import { loginValidation } from '../validation/validation';
+import Organization from '../models/Organizations';
 
 const router = Router();
 
@@ -40,6 +41,8 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Invalid username or password' });
     }
 
+    const org = await Organization.findByPk(user.id) as any;
+
     // Compare the provided password with the stored hash
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
@@ -62,7 +65,7 @@ router.post('/login', async (req, res) => {
       { expiresIn: JWT_EXPIRES }
     );
 
-    return res.status(200).json({ message: 'Login successful', token });
+    return res.status(200).json({ message: 'Login successful', token, username: user.username, organization: org.name });
 
   } catch (error: any) {
     res.status(500).json({
