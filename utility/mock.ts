@@ -87,18 +87,6 @@ const mockQuestions: iQuestion[] = [
 
 const mockQuestionChoices: iQuestionChoice[] = [
     {
-        questionId: 3,
-        choice: 'Foldboldbanen'
-    },
-    {
-        questionId: 3,
-        choice: 'Gangen'
-    },
-    {
-        questionId: 3,
-        choice: 'Klasseværelset'
-    },
-    {
         questionId: 4,
         choice: 'Skolegården'
     },
