@@ -82,6 +82,24 @@ const mockQuestions: iQuestion[] = [
         title: 'Type',
         description: 'Hvilken slags hændelse var det',
         type: QuestionType.MultiSelect
+    },
+    {
+        organizationId: 1,
+        title: 'Situation',
+        description: 'I hvilken situation skete episoden',
+        type: QuestionType.SelectOne
+    },
+    {
+        organizationId: 1,
+        title: 'Påvirkning',
+        description: 'Hvor meget påvirkede det dig bagefter?',
+        type: QuestionType.Scale
+    },
+    {
+        organizationId: 1,
+        title: 'Mulighed for hjælp',
+        description: 'Var der mulighed for at tilkalde hjælp?',
+        type: QuestionType.YesNo
     }
 ];
 
@@ -123,6 +141,18 @@ const mockQuestionChoices: iQuestionChoice[] = [
         questionId: 5,
         choice: 'I hovedet',
         dependantChoice: 7
+    },
+    {
+        questionId: 6,
+        choice: 'Afslag på ønske/krav'
+    },
+    {
+        questionId: 6,
+        choice: 'Forsøg på at berolige ophidset person'
+    },
+    {
+        questionId: 6,
+        choice: 'Konfliktløsning mellem person og ansat'
     }
 ]
 
@@ -262,50 +292,143 @@ const mockAnswers: iAnswer[] = [
     {
         caseId: 7,
         questionId: 5
-    }
+    },
+    {
+        caseId: 1,
+        questionId: 6
+    },
+    {
+        caseId: 3,
+        questionId: 6
+    },
+    {
+        caseId: 4,
+        questionId: 6
+    },
+    {
+        caseId: 5,
+        questionId: 6
+    },
+    {
+        caseId: 6,
+        questionId: 6
+    },
+    // Choice answers (QuestionType.Scale)
+    {
+        caseId: 1,
+        questionId: 7,
+        answer: '5'
+    },
+    {
+        caseId: 3,
+        questionId: 7,
+        answer: '6'
+    },
+    {
+        caseId: 4,
+        questionId: 7,
+        answer: '10'
+    },
+    {
+        caseId: 5,
+        questionId: 7,
+        answer: '1'
+    },
+    {
+        caseId: 6,
+        questionId: 7,
+        answer: '2'
+    },
+    // Choice answers (QuestionType.YesNo)
+    {
+        caseId: 1,
+        questionId: 8,
+        answer: 'YES'
+    },
+    {
+        caseId: 3,
+        questionId: 8,
+        answer: 'YES'
+    },
+    {
+        caseId: 4,
+        questionId: 8,
+        answer: 'NO'
+    },
+    {
+        caseId: 5,
+        questionId: 8,
+        answer: 'NO'
+    },
+    {
+        caseId: 6,
+        questionId: 8,
+        answer: 'YES'
+    },
 ];
 
 const mockAnswerChoices: iAnswerChoice[] = [
     {
         answerId: 12,
-        choiceId: 4 // Skolegården
+        choiceId: 1 // Skolegården
     },
     {
         answerId: 13,
-        choiceId: 6 // SFO'en
+        choiceId: 3 // SFO'en
     },
     {
         answerId: 14,
-        choiceId: 5 // Klasseværelset
+        choiceId: 2 // Klasseværelset
     },
     {
         answerId: 15,
-        choiceId: 8 // Spark
+        choiceId: 5 // Spark
     },
     {
         answerId: 16,
-        choiceId: 7 // Spyt
+        choiceId: 4 // Spyt
     },
     {
         answerId: 17,
-        choiceId: 9 // Niven
+        choiceId: 6 // Niven
     },
     {
         answerId: 18,
-        choiceId: 10 // Kradsen
+        choiceId: 7 // Kradsen
     },
     {
         answerId: 19,
-        choiceId: 11 // På arm
+        choiceId: 8 // På arm
     },
     {
         answerId: 20,
-        choiceId: 12 // I hovedet
+        choiceId: 9 // I hovedet
     },
     {
         answerId: 21,
-        choiceId: 7 // Spyt
-    }
+        choiceId: 4 // Spyt
+    },
+    // chocies 10,11,12
+    {
+        answerId: 22,
+        choiceId: 10 // Afslag på ønske/krav
+    },
+    {
+        answerId: 23,
+        choiceId: 11 // Forsøg på at berolige ophidset person
+    },
+    {
+        answerId: 24,
+        choiceId: 12 // Konfliktløsning mellem person og ansat
+    },
+    {
+        answerId: 25,
+        choiceId: 10 // Afslag på ønske/krav
+    },
+    {
+        answerId: 26,
+        choiceId: 12 // Konfliktløsning mellem person og ansat
+    },
 ]
 
 export async function generateMockData(): Promise<void> {
