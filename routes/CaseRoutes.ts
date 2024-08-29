@@ -19,8 +19,8 @@ declare module 'express-serve-static-core' {
   }
 }
 
-router.post('/create-new-case', authenticateToken,  async (req: Request, res: Response) => {
-    const transaction = await sequelize.transaction();
+router.post('/create-new-case', authenticateToken, async (req: Request, res: Response) => {
+  const transaction = await sequelize.transaction();
   try {
     const { error } = createCaseValidation(req.body);
 
@@ -32,7 +32,7 @@ router.post('/create-new-case', authenticateToken,  async (req: Request, res: Re
     if (!req.user) {
       return res.status(400).json({ message: 'No user found' });
     }
-    
+
     const userId = req.user.id;
     const organizationId = req.user.organizationId;
 
@@ -59,15 +59,18 @@ router.post('/create-new-case', authenticateToken,  async (req: Request, res: Re
       );
 
       const answerId = newAnswer.get('id') as number;
-      // If there's a choice, create an AnswerChoice
-      if (answer.choice) {
-        await AnswerChoice.create(
-          {
-            answerId: answerId,
-            choiceId: answer.choice,
-          },
-          { transaction }
-        );
+
+      // If there's a choice array, create AnswerChoice entries
+      if (Array.isArray(answer.choice)) {
+        for (const choiceId of answer.choice) {
+          await AnswerChoice.create(
+            {
+              answerId: answerId,
+              choiceId: choiceId,
+            },
+            { transaction }
+          );
+        }
       }
     }
 
@@ -95,7 +98,7 @@ router.post('/update-case/:caseId', authenticateToken, async (req: Request, res:
     }
 
     let caseToEdit = await Case.findOne({
-       where: { id: caseId, userId: userId}
+      where: { id: caseId, userId: userId }
     });
 
     if (!caseToEdit) {
@@ -104,7 +107,7 @@ router.post('/update-case/:caseId', authenticateToken, async (req: Request, res:
     }
 
     const changedAnswers = req.body;
-    
+
     for (const caseItem of changedAnswers) {
       const { question, answer } = caseItem;
 
@@ -119,24 +122,32 @@ router.post('/update-case/:caseId', authenticateToken, async (req: Request, res:
         }
       );
 
-      if (answer.choice) {
+      if (Array.isArray(answer.choice)) {
+        
         const answerInstance = await Answer.findOne({
           where: { caseId: caseId, questionId: question },
           transaction
         }) as unknown as typeof Answer & { id: number };
 
         if (answerInstance) {
-          await AnswerChoice.update(
-            {
-              choiceId: answer.choice,
+          // First, delete any existing choices for this answer
+          await AnswerChoice.destroy({
+            where: {
+              answerId: answerInstance.id,
             },
-            {
-              where: {
-                answerId: answerInstance.id, // Use the correctly typed id here
+            transaction,
+          });
+
+          // Then, insert the new choices
+          for (const choiceId of answer.choice) {
+            await AnswerChoice.create(
+              {
+                answerId: answerInstance.id,
+                choiceId: choiceId,
               },
-              transaction
-            }
-          );
+              { transaction }
+            );
+          }
         }
       }
     }

@@ -20,10 +20,13 @@ components:
           type: string
           description: The text answer to the question
         choice:
-          type: integer
-          description: The ID of the choice selected
+          type: array
+          items:
+            type: integer
+          description: An array of IDs representing the choices selected
       example:
         answer: "15-08-2024"
+        choice: [7, 8]
 
     CaseItem:
       type: object
@@ -40,6 +43,7 @@ components:
         question: 1
         answer:
           answer: "15-08-2024"
+          choice: [7, 8]
 
     UpdateCaseRequest:
       type: array
@@ -54,7 +58,7 @@ components:
             answer: "Legepladsen"
         - question: 5
           answer:
-            choice: 8
+            choice: [8]
 
     CreateCaseRequest:
       type: array
@@ -69,7 +73,7 @@ components:
             answer: "Billedkunst lokale"
         - question: 5
           answer:
-            choice: 7
+            choice: [7, 9]
 
     CaseResponse:
       type: object

@@ -28,7 +28,7 @@ export const createCaseValidation = (data: CreateCaseData[]) => {
             question: Joi.number().required(),
             answer: Joi.object({
                 answer: Joi.string().optional(),
-                choice: Joi.number().optional(),
+                choice: Joi.array().items(Joi.number()).optional(),
             }).required()
         })
     );
