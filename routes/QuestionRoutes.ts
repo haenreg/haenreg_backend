@@ -1,8 +1,11 @@
 import express, { Router, Request, Response } from 'express';
 import { iUser } from "../interfaces/iUser";
-import { authenticateToken } from "../validation/auth";
+import { authenticateToken, verifyIsLeader } from "../validation/auth";
 import Question from '../models/Questions';
 import QuestionChoice from '../models/QuestionChoices';
+import sequelize from '../config/database';
+import { createQuestionValidation } from '../validation/validation';
+import { QuestionType } from '../interfaces/iQuestion';
 
 const router = Router();
 
@@ -77,5 +80,68 @@ router.get('/get-questions', authenticateToken, async (req: Request, res: Respon
     }
 });
 
+router.post('/create-question', verifyIsLeader, async (req: Request, res: Response) => {
+    const transaction = await sequelize.transaction();
+
+    try {
+        const { error } = createQuestionValidation(req.body);
+
+        if (error) {
+            await transaction.rollback();
+            return res.status(400).json({ error: error.details.map(d => d.message).join(', ') });
+        }
+
+        const organizationId = req.user?.organizationId
+
+        const { title, description, type, questionChoices } = req.body;
+
+        const question = await Question.create(
+            {
+                title,
+                description,
+                type,
+                organizationId
+            },
+            { transaction }
+        );
+
+        const questionId = question.get('id');
+
+        if (questionChoices && questionChoices.length > 0 && (type == QuestionType.MultiSelect || type == QuestionType.SelectOne)) {
+            for (const choiceData of questionChoices) {
+                const { choice, dependent } = choiceData;
+
+                const mainChoice = await QuestionChoice.create(
+                    {
+                        questionId: questionId,
+                        choice,
+                    },
+                    { transaction }
+                );
+
+                const mainChoiceId = mainChoice.get('id');
+
+                if (dependent && dependent.choice) {
+                    await QuestionChoice.create(
+                        {
+                            questionId: questionId,
+                            choice: dependent.choice,
+                            dependantChoice: mainChoiceId,
+                        },
+                        { transaction }
+                    );
+                }
+            }
+        }
+
+        await transaction.commit();
+
+        res.status(201).json({ message: 'Question created successfully', question });
+
+    } catch (error) {
+        await transaction.rollback();
+        res.status(500).json({ error: (error as Error).message });
+    }
+});
 
 export default router;

@@ -35,3 +35,21 @@ export const createCaseValidation = (data: CreateCaseData[]) => {
 
     return schema.validate(data);
 }
+
+export const createQuestionValidation = (data: CreateCaseData[]) => {
+    const schema = Joi.object({
+            title: Joi.string().required(),
+            description: Joi.string(),
+            type: Joi.string().required(),
+            questionChoices: Joi.array().items(
+                Joi.object({
+                    choice: Joi.string().required(),
+                    dependent: Joi.object({
+                        choice: Joi.string().required()
+                    })
+                })
+            )
+        });
+
+    return schema.validate(data);
+}
