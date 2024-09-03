@@ -26,7 +26,7 @@ export function getCaseQueryConfig(): { attributes: string[], include: IncludeOp
                             {
                                 model: QuestionChoice,
                                 as: 'questionChoice',
-                                attributes: ['id', 'choice'],
+                                attributes: ['id', 'choice', 'dependantChoice'],
                                 include: [
                                     {
                                         model: QuestionChoice,
@@ -41,4 +41,35 @@ export function getCaseQueryConfig(): { attributes: string[], include: IncludeOp
             }
         ]
     };
+}
+
+export function transformDependentChoicesCase(caseData: any) {
+    const transformedCase = caseData.toJSON();
+
+    transformedCase.answers.forEach(answer => {
+        answer.answerChoices.forEach(answerChoice => {
+            const questionChoice = answerChoice.questionChoice;
+
+            if (questionChoice.dependent) {
+                // Swap the dependent and primary questionChoice
+                answerChoice.questionChoice = {
+                    id: questionChoice.dependent.id,
+                    choice: questionChoice.dependent.choice,
+                    dependent: [{
+                        id: questionChoice.id,
+                        choice: questionChoice.choice
+                    }]
+                };
+            }
+            delete answerChoice.questionChoice.dependantChoice;
+        });
+    });
+
+    return transformedCase;
+}
+
+export function transformDependentChoicesCases(casesData: any[]): any[] {
+    return casesData.map(caseData => {
+        return transformDependentChoicesCase(caseData);
+    });
 }

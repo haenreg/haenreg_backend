@@ -11,6 +11,7 @@ import swaggerUi from 'swagger-ui-express';
 import yaml from 'js-yaml';
 import path from 'path';
 import fs from 'fs';
+import cors from 'cors';
 
 dotenv.config();
 
@@ -18,6 +19,14 @@ const app : Express = express();
 
 const swaggerPath = path.join(__dirname, 'swagger.yaml');
 const swaggerFile = yaml.load(fs.readFileSync(swaggerPath, 'utf8'));
+
+const corsOptions = {
+  origin: ['http://localhost:4200', 'https://your-production-domain.com'], // Replace with your allowed origins
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
 
 app.use(bodyParser.json());
 app.use('/api/users', userRoute);

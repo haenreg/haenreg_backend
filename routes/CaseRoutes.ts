@@ -1,5 +1,5 @@
 import express, { Router, Request, Response } from 'express';
-import { authenticateToken } from '../validation/auth';
+import { authenticateToken, verifyIsLeader } from '../validation/auth';
 import { createCaseValidation } from '../validation/validation';
 import sequelize from '../config/database';
 import { iUser } from '../interfaces/iUser';
@@ -9,7 +9,7 @@ import AnswerChoice from '../models/AnswerChoices';
 import { CaseApproved } from '../interfaces/iCase';
 import Question from '../models/Questions';
 import QuestionChoice from '../models/QuestionChoices';
-import { getCaseQueryConfig } from '../utility/utility';
+import { getCaseQueryConfig, transformDependentChoicesCase, transformDependentChoicesCases } from '../utility/utility';
 
 const router = Router();
 
@@ -171,8 +171,10 @@ router.get('/get-cases-by-user', authenticateToken, async (req: Request, res: Re
             ...caseQueryConfig
         });
 
+        const transformedCases = transformDependentChoicesCases(cases);
 
-        res.status(200).json(cases);
+
+        res.status(200).json(transformedCases);
     } catch (error) {
         res.status(500).json({ error: (error as Error).message });
     }
@@ -205,10 +207,23 @@ router.get('/get-case/:caseId', authenticateToken, async (req: Request, res: Res
             return res.status(400).json({ message: 'No case found' });
         }
 
-        res.status(200).json(_case);
+        // Transform the data structure as needed
+        const transformedCase = transformDependentChoicesCase(_case);
+
+        res.status(200).json(transformedCase);
     } catch (error) {
         res.status(500).json({ error: (error as Error).message });
     }
+});
+
+
+router.get('/get-all-cases', verifyIsLeader, async (req: Request, res: Response) => {
+  try {
+    res.status(200).json({message: 'YEEE'});
+
+  } catch (error) {
+    res.status(500).json({error: (error as Error).message});
+  }
 })
 
 export default router;
