@@ -506,6 +506,88 @@ paths:
           description: Unauthorized - Invalid or missing JWT token
         "500":
           description: Internal Server Error
+  /get-all-cases:
+    post:
+      summary: Retrieve all cases with pagination, filtering, and sorting
+      tags:
+        - case
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                page:
+                  type: integer
+                  description: The page number to retrieve
+                  example: 1
+                limit:
+                  type: integer
+                  description: The number of items per page
+                  example: 10
+                userId:
+                  type: integer
+                  description: Filter cases by user ID
+                  example: 5
+                sortField:
+                  type: string
+                  description: The ID of the question to sort by
+                  example: "3"
+                sortOrder:
+                  type: string
+                  description: The order of sorting, either ASC for ascending or DESC for descending
+                  example: "ASC"
+              example:
+                page: 1
+                limit: 10
+                userId: 5
+                sortField: "3"
+                sortOrder: "ASC"
+      responses:
+        200:
+          description: A paginated list of cases
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalItems:
+                    type: integer
+                    description: The total number of cases
+                    example: 50
+                  totalPages:
+                    type: integer
+                    description: The total number of pages
+                    example: 5
+                  currentPage:
+                    type: integer
+                    description: The current page number
+                    example: 1
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/CaseResponse"
+        400:
+          description: Bad request, possible reasons include invalid filter or pagination parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid filter parameters
+        500:
+          description: Server error, something went wrong on the server side
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Internal server error
 
 security:
   - bearerAuth: []

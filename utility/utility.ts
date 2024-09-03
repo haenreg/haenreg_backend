@@ -73,3 +73,31 @@ export function transformDependentChoicesCases(casesData: any[]): any[] {
         return transformDependentChoicesCase(caseData);
     });
 }
+
+export function sortCases(cases: any[], questionId: number, sortOrder: 'ASC' | 'DESC'): any[] {
+    return cases.sort((a, b) => {
+        let fieldA = getSortValue(a, questionId);
+        let fieldB = getSortValue(b, questionId);
+
+        if (sortOrder === 'ASC') {
+            return fieldA < fieldB ? -1 : fieldA > fieldB ? 1 : 0;
+        } else {
+            return fieldA > fieldB ? -1 : fieldA < fieldB ? 1 : 0;
+        }
+    });
+}
+
+export function getSortValue(caseData: any, questionId: number): string {
+    const answer = caseData.answers.find(ans => ans.question.id === questionId);
+    if (answer) {
+        if (answer.question.type === 'TEXT' || answer.question.type === 'DATE') {
+            return answer.answer || ''; // Sort by the answer string for TEXT or DATE types
+        }
+        if (answer.question.type === 'SELECT_ONE' || answer.question.type === 'MULTI_SELECT') {
+            return answer.answerChoices.map(choice => choice.questionChoice.choice).join(', ') || ''; // Sort by the choices string
+        }
+    }
+    return ''; // Default if no matching question found
+}
+
+

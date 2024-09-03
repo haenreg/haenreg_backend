@@ -9,7 +9,7 @@ import AnswerChoice from '../models/AnswerChoices';
 import { CaseApproved } from '../interfaces/iCase';
 import Question from '../models/Questions';
 import QuestionChoice from '../models/QuestionChoices';
-import { getCaseQueryConfig, transformDependentChoicesCase, transformDependentChoicesCases } from '../utility/utility';
+import { getCaseQueryConfig, sortCases, transformDependentChoicesCase, transformDependentChoicesCases } from '../utility/utility';
 
 const router = Router();
 
@@ -217,13 +217,47 @@ router.get('/get-case/:caseId', authenticateToken, async (req: Request, res: Res
 });
 
 
-router.get('/get-all-cases', verifyIsLeader, async (req: Request, res: Response) => {
-  try {
-    res.status(200).json({message: 'YEEE'});
+router.post('/get-all-cases', verifyIsLeader, async (req: Request, res: Response) => {
+    try {
+        const { page = 1, limit = 10, userId, sortField, sortOrder = 'ASC' } = req.body;
 
-  } catch (error) {
-    res.status(500).json({error: (error as Error).message});
-  }
-})
+        const offset = (page - 1) * limit;
+        const caseQueryConfig = getCaseQueryConfig();
+
+        // Build the where clause for filtering
+        const whereClause: any = {};
+        if (userId) {
+            whereClause.userId = userId;
+        }
+
+        // Fetch cases with pagination and filtering
+        const cases = await Case.findAndCountAll({
+            where: whereClause,
+            ...caseQueryConfig,
+            limit,
+            offset,
+            distinct: true, // Ensures proper count when using include
+        });
+
+        let transformedCases = transformDependentChoicesCases(cases.rows);
+
+        // Apply sorting by questionId
+        if (sortField) {
+            const questionId = parseInt(sortField, 10);
+            transformedCases = sortCases(transformedCases, questionId, sortOrder);
+        }
+
+        res.status(200).json({
+            totalItems: cases.count,
+            totalPages: Math.ceil(cases.count / limit),
+            currentPage: page,
+            data: transformedCases
+        });
+    } catch (error) {
+        res.status(500).json({ error: (error as Error).message });
+    }
+});
+
+
 
 export default router;
