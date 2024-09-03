@@ -216,16 +216,19 @@ router.get('/get-case/:caseId', authenticateToken, async (req: Request, res: Res
     }
 });
 
-
 router.post('/get-all-cases', verifyIsLeader, async (req: Request, res: Response) => {
     try {
         const { page = 1, limit = 10, userId, sortField, sortOrder = 'ASC' } = req.body;
+
+        const orgId = req.user?.organizationId
 
         const offset = (page - 1) * limit;
         const caseQueryConfig = getCaseQueryConfig();
 
         // Build the where clause for filtering
-        const whereClause: any = {};
+        const whereClause: any = {
+          organizationId: orgId
+        };
         if (userId) {
             whereClause.userId = userId;
         }
@@ -258,6 +261,52 @@ router.post('/get-all-cases', verifyIsLeader, async (req: Request, res: Response
     }
 });
 
+router.put('/approve-case/:caseId', verifyIsLeader, async (req: Request, res: Response) => {
+  try {
+    const { caseId } = req.params;
 
+    const orgId = req.user?.organizationId
+
+    const _case = await Case.findOne({
+      where: { id: caseId, organizationId: orgId}
+    }) as any;
+
+    if (!_case) {
+      return res.status(404).json({ message: 'Case not found' });
+    }
+
+    _case.approved = CaseApproved.Approved;
+
+    await _case.save();
+
+    res.status(200).json({ message: 'Case approved successfully', case: _case });
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+router.put('/disprove-case/:caseId', verifyIsLeader, async (req: Request, res: Response) => {
+  try {
+    const { caseId } = req.params;
+
+    const orgId = req.user?.organizationId
+
+    const _case = await Case.findOne({
+      where: { id: caseId, organizationId: orgId}
+    }) as any;
+
+    if (!_case) {
+      return res.status(404).json({ message: 'Case not found' });
+    }
+
+    _case.approved = CaseApproved.NotApproved;
+
+    await _case.save();
+
+    res.status(200).json({ message: 'Case disproved successfully', case: _case });
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
 
 export default router;
