@@ -506,7 +506,7 @@ paths:
           description: Unauthorized - Invalid or missing JWT token
         "500":
           description: Internal Server Error
-  /get-all-cases:
+  /cases/get-all-cases:
     post:
       summary: Retrieve all cases with pagination, filtering, and sorting
       tags:
@@ -588,7 +588,7 @@ paths:
                   error:
                     type: string
                     example: Internal server error
-  /create-question:
+  /questions/create-question:
     post:
       summary: Create a new question with choices
       tags:
@@ -712,7 +712,7 @@ paths:
                     type: string
                     example: "An unexpected error occurred"
 
-  /approve-case/{caseId}:
+  /cases/approve-case/{caseId}:
     put:
       summary: Approve a case
       tags:
@@ -759,7 +759,7 @@ paths:
                     type: string
                     example: An unexpected error occurred
 
-  /disprove-case/{caseId}:
+  /cases/disprove-case/{caseId}:
     put:
       summary: Disprove a case
       tags:
@@ -805,7 +805,7 @@ paths:
                   error:
                     type: string
                     example: An unexpected error occurred
-  /update-question/{questionId}:
+  /questions/update-question/{questionId}:
     post:
       tags:
         - administration question
@@ -892,6 +892,74 @@ paths:
                   error:
                     type: string
                     example: "Internal server error"
+  /users/fetch-user:
+    get:
+      tags:
+        - user
+      summary: Fetch user data from token
+      description: Retrieves the logged-in user's information based on the token provided in the Authorization header. This does not refresh or generate a new token.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successfully fetched user data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                    example: "exampleUser"
+                  organization:
+                    type: string
+                    example: "exampleOrg"
+                  isOrgLeader:
+                    type: boolean
+                    example: true
+        "403":
+          description: No token provided
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "No token provided"
+        "401":
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid token"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "User not found"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Title:
+                    type: string
+                    example: "Something went wrong when fetching user data"
+                  Message:
+                    type: string
+                    example: "Error message here"
 
 security:
   - bearerAuth: []

@@ -75,4 +75,31 @@ router.post('/login', async (req, res) => {
   }
 });
 
+router.get('/fetch-user', authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+
+    // Fetch the user from the database
+    const user = await User.findByPk(userId) as unknown as iUser;
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const org = await Organization.findByPk(user.organizationId) as any;
+
+    // Return the same user data as in login
+    return res.status(200).json({ 
+      username: user.username, 
+      organization: org.name,
+      isOrgLeader: user.isOrgLeader 
+    });
+
+  } catch (error: any) {
+    res.status(500).json({
+      Title: 'Something went wrong when fetching user data',
+      Message: error.message,
+    });
+  }
+});
+
 export default router;
