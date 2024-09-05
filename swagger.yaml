@@ -304,7 +304,6 @@ components:
             - id: 10
               choice: "Kradsen"
               dependent: []
-    
 
 tags:
   - name: case
@@ -806,6 +805,93 @@ paths:
                   error:
                     type: string
                     example: An unexpected error occurred
+  /update-question/{questionId}:
+    post:
+      tags:
+        - administration question
+      summary: Update an existing question
+      description: This endpoint allows an organization leader to update an existing question, including its title, description, type, and associated choices.
+      parameters:
+        - in: path
+          name: questionId
+          required: true
+          schema:
+            type: integer
+          description: The ID of the question to be updated
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "Hvor mange blev du?"
+                description:
+                  type: string
+                  example: "Beskriv hvor bange du blev"
+                type:
+                  type: string
+                  enum: [SELECT_ONE, MULTI_SELECT]
+                  example: "SELECT_ONE"
+                questionChoices:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      choice:
+                        type: string
+                        example: "Choice1"
+                      dependent:
+                        type: object
+                        properties:
+                          choice:
+                            type: string
+                            example: "this is a child choice"
+      responses:
+        "200":
+          description: Question updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Question updated successfully"
+                  question:
+                    $ref: "#/components/schemas/Question"
+        "400":
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid data"
+        "404":
+          description: Question not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Question not found"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
 
 security:
   - bearerAuth: []

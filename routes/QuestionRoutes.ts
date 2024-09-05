@@ -144,4 +144,60 @@ router.post('/create-question', verifyIsLeader, async (req: Request, res: Respon
     }
 });
 
+router.post('/update-question/:questionId', verifyIsLeader, async (req: Request, res: Response) => {
+    const transaction = await sequelize.transaction();
+
+    try {
+        const { questionId } = req.params;
+        const { title, description, type, questionChoices } = req.body;
+
+        const question = await Question.findOne({ where: { id: questionId, organizationId: req.user?.organizationId } });
+
+        if (!question) {
+            await transaction.rollback();
+            return res.status(404).json({ error: 'Question not found' });
+        }
+
+        await question.update({ title, description, type }, { transaction });
+
+        if (questionChoices && (type == QuestionType.MultiSelect || type == QuestionType.SelectOne)) {
+
+            await QuestionChoice.destroy({ where: { questionId }, transaction });
+
+            for (const choiceData of questionChoices) {
+                const { choice, dependent } = choiceData;
+
+                const mainChoice = await QuestionChoice.create(
+                    {
+                        questionId: questionId,
+                        choice,
+                    },
+                    { transaction }
+                );
+
+                const mainChoiceId = mainChoice.get('id');
+
+                if (dependent && dependent.choice) {
+                    await QuestionChoice.create(
+                        {
+                            questionId: questionId,
+                            choice: dependent.choice,
+                            dependantChoice: mainChoiceId,
+                        },
+                        { transaction }
+                    );
+                }
+            }
+        }
+
+        await transaction.commit();
+
+        res.status(200).json({ message: 'Question updated successfully', question });
+
+    } catch (error) {
+        await transaction.rollback();
+        res.status(500).json({ error: (error as Error).message });
+    }
+});
+
 export default router;
