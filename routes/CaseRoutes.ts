@@ -1,5 +1,5 @@
 import express, { Router, Request, Response } from 'express';
-import { authenticateToken } from '../validation/auth';
+import { authenticateToken, verifyIsLeader } from '../validation/auth';
 import { createCaseValidation } from '../validation/validation';
 import sequelize from '../config/database';
 import { iUser } from '../interfaces/iUser';
@@ -9,7 +9,7 @@ import AnswerChoice from '../models/AnswerChoices';
 import { CaseApproved } from '../interfaces/iCase';
 import Question from '../models/Questions';
 import QuestionChoice from '../models/QuestionChoices';
-import { getCaseQueryConfig } from '../utility/utility';
+import { getCaseQueryConfig, sortCases, transformDependentChoicesCase, transformDependentChoicesCases } from '../utility/utility';
 
 const router = Router();
 
@@ -171,8 +171,10 @@ router.get('/get-cases-by-user', authenticateToken, async (req: Request, res: Re
             ...caseQueryConfig
         });
 
+        const transformedCases = transformDependentChoicesCases(cases);
 
-        res.status(200).json(cases);
+
+        res.status(200).json(transformedCases);
     } catch (error) {
         res.status(500).json({ error: (error as Error).message });
     }
@@ -205,10 +207,106 @@ router.get('/get-case/:caseId', authenticateToken, async (req: Request, res: Res
             return res.status(400).json({ message: 'No case found' });
         }
 
-        res.status(200).json(_case);
+        // Transform the data structure as needed
+        const transformedCase = transformDependentChoicesCase(_case);
+
+        res.status(200).json(transformedCase);
     } catch (error) {
         res.status(500).json({ error: (error as Error).message });
     }
-})
+});
+
+router.post('/get-all-cases', verifyIsLeader, async (req: Request, res: Response) => {
+    try {
+        const { page = 1, limit = 10, userId, sortField, sortOrder = 'ASC' } = req.body;
+
+        const orgId = req.user?.organizationId
+
+        const offset = (page - 1) * limit;
+        const caseQueryConfig = getCaseQueryConfig();
+
+        // Build the where clause for filtering
+        const whereClause: any = {
+          organizationId: orgId
+        };
+        if (userId) {
+            whereClause.userId = userId;
+        }
+
+        // Fetch cases with pagination and filtering
+        const cases = await Case.findAndCountAll({
+            where: whereClause,
+            ...caseQueryConfig,
+            limit,
+            offset,
+            distinct: true, // Ensures proper count when using include
+        });
+
+        let transformedCases = transformDependentChoicesCases(cases.rows);
+
+        // Apply sorting by questionId
+        if (sortField) {
+            const questionId = parseInt(sortField, 10);
+            transformedCases = sortCases(transformedCases, questionId, sortOrder);
+        }
+
+        res.status(200).json({
+            totalItems: cases.count,
+            totalPages: Math.ceil(cases.count / limit),
+            currentPage: page,
+            data: transformedCases
+        });
+    } catch (error) {
+        res.status(500).json({ error: (error as Error).message });
+    }
+});
+
+router.put('/approve-case/:caseId', verifyIsLeader, async (req: Request, res: Response) => {
+  try {
+    const { caseId } = req.params;
+
+    const orgId = req.user?.organizationId
+
+    const _case = await Case.findOne({
+      where: { id: caseId, organizationId: orgId}
+    }) as any;
+
+    if (!_case) {
+      return res.status(404).json({ message: 'Case not found' });
+    }
+
+    _case.approved = CaseApproved.Approved;
+
+    await _case.save();
+
+    res.status(200).json({ message: 'Case approved successfully', case: _case });
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+router.put('/disprove-case/:caseId', verifyIsLeader, async (req: Request, res: Response) => {
+  try {
+    const { caseId } = req.params;
+
+    const orgId = req.user?.organizationId
+
+    const _case = await Case.findOne({
+      where: { id: caseId, organizationId: orgId}
+    }) as any;
+
+    if (!_case) {
+      return res.status(404).json({ message: 'Case not found' });
+    }
+
+    _case.approved = CaseApproved.NotApproved;
+
+    await _case.save();
+
+    res.status(200).json({ message: 'Case disproved successfully', case: _case });
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
 
 export default router;

@@ -506,6 +506,460 @@ paths:
           description: Unauthorized - Invalid or missing JWT token
         "500":
           description: Internal Server Error
+  /cases/get-all-cases:
+    post:
+      summary: Retrieve all cases with pagination, filtering, and sorting
+      tags:
+        - administration case
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                page:
+                  type: integer
+                  description: The page number to retrieve
+                  example: 1
+                limit:
+                  type: integer
+                  description: The number of items per page
+                  example: 10
+                userId:
+                  type: integer
+                  description: Filter cases by user ID
+                  example: 5
+                sortField:
+                  type: string
+                  description: The ID of the question to sort by
+                  example: "3"
+                sortOrder:
+                  type: string
+                  description: The order of sorting, either ASC for ascending or DESC for descending
+                  example: "ASC"
+              example:
+                page: 1
+                limit: 10
+                userId: 5
+                sortField: "3"
+                sortOrder: "ASC"
+      responses:
+        200:
+          description: A paginated list of cases
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalItems:
+                    type: integer
+                    description: The total number of cases
+                    example: 50
+                  totalPages:
+                    type: integer
+                    description: The total number of pages
+                    example: 5
+                  currentPage:
+                    type: integer
+                    description: The current page number
+                    example: 1
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/CaseResponse"
+        400:
+          description: Bad request, possible reasons include invalid filter or pagination parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid filter parameters
+        500:
+          description: Server error, something went wrong on the server side
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Internal server error
+  /questions/create-question:
+    post:
+      summary: Create a new question with choices
+      tags:
+        - administration question
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: The title of the question
+                  example: "Hvor mange blev du?"
+                description:
+                  type: string
+                  description: The description of the question
+                  example: "Beskriv hvor bange du blev"
+                type:
+                  type: string
+                  description: The type of the question, e.g., SELECT_ONE or MULTI_SELECT
+                  example: "SELECT_ONE"
+                questionChoices:
+                  type: array
+                  description: A list of choices for the question
+                  items:
+                    type: object
+                    properties:
+                      choice:
+                        type: string
+                        description: The text of the choice
+                        example: "Choice1"
+                      dependent:
+                        type: object
+                        description: Dependent choice if this choice is selected
+                        properties:
+                          choice:
+                            type: string
+                            description: The text of the dependent choice
+                            example: "this is a child choice"
+      responses:
+        201:
+          description: Question created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Question created successfully
+                  question:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        description: The ID of the created question
+                        example: 1
+                      title:
+                        type: string
+                        description: The title of the question
+                        example: "Hvor mange blev du?"
+                      description:
+                        type: string
+                        description: The description of the question
+                        example: "Beskriv hvor bange du blev"
+                      type:
+                        type: string
+                        description: The type of the question
+                        example: "SELECT_ONE"
+                      organizationId:
+                        type: integer
+                        description: The ID of the organization to which the question belongs
+                        example: 2
+                      questionChoices:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              description: The ID of the question choice
+                              example: 1
+                            choice:
+                              type: string
+                              description: The text of the choice
+                              example: "Choice1"
+                            dependent:
+                              type: array
+                              description: Dependent choices
+                              items:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                    description: The ID of the dependent question choice
+                                    example: 2
+                                  choice:
+                                    type: string
+                                    description: The text of the dependent choice
+                                    example: "this is a child choice"
+        400:
+          description: Bad request, validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "title is required, type is required"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "An unexpected error occurred"
+
+  /cases/approve-case/{caseId}:
+    put:
+      summary: Approve a case
+      tags:
+        - administration case
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          description: The ID of the case to approve
+          schema:
+            type: integer
+            example: 123
+      responses:
+        200:
+          description: Case approved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Case approved successfully
+                  case:
+                    $ref: "#/components/schemas/CaseResponse"
+        404:
+          description: Case not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Case not found
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: An unexpected error occurred
+
+  /cases/disprove-case/{caseId}:
+    put:
+      summary: Disprove a case
+      tags:
+        - administration case
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          description: The ID of the case to disprove
+          schema:
+            type: integer
+            example: 123
+      responses:
+        200:
+          description: Case disproved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Case disproved successfully
+                  case:
+                    $ref: "#/components/schemas/CaseResponse"
+        404:
+          description: Case not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Case not found
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: An unexpected error occurred
+  /questions/update-question/{questionId}:
+    post:
+      tags:
+        - administration question
+      summary: Update an existing question
+      description: This endpoint allows an organization leader to update an existing question, including its title, description, type, and associated choices.
+      parameters:
+        - in: path
+          name: questionId
+          required: true
+          schema:
+            type: integer
+          description: The ID of the question to be updated
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "Hvor mange blev du?"
+                description:
+                  type: string
+                  example: "Beskriv hvor bange du blev"
+                type:
+                  type: string
+                  enum: [SELECT_ONE, MULTI_SELECT]
+                  example: "SELECT_ONE"
+                questionChoices:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      choice:
+                        type: string
+                        example: "Choice1"
+                      dependent:
+                        type: object
+                        properties:
+                          choice:
+                            type: string
+                            example: "this is a child choice"
+      responses:
+        "200":
+          description: Question updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Question updated successfully"
+                  question:
+                    $ref: "#/components/schemas/Question"
+        "400":
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid data"
+        "404":
+          description: Question not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Question not found"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+  /users/fetch-user:
+    get:
+      tags:
+        - user
+      summary: Fetch user data from token
+      description: Retrieves the logged-in user's information based on the token provided in the Authorization header. This does not refresh or generate a new token.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successfully fetched user data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                    example: "exampleUser"
+                  organization:
+                    type: string
+                    example: "exampleOrg"
+                  isOrgLeader:
+                    type: boolean
+                    example: true
+        "403":
+          description: No token provided
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "No token provided"
+        "401":
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid token"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "User not found"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Title:
+                    type: string
+                    example: "Something went wrong when fetching user data"
+                  Message:
+                    type: string
+                    example: "Error message here"
 
 security:
   - bearerAuth: []
