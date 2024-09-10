@@ -29,7 +29,7 @@ const Case = sequelize.define('Case', {
 });
 
 // Define relationships
-Case.belongsTo(User, { foreignKey: 'userId' });
+Case.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 User.hasMany(Case, { foreignKey: 'userId' });
 
 Case.belongsTo(Organization, { foreignKey: 'organizationId' });

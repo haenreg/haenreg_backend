@@ -15,8 +15,20 @@ const JWT_EXPIRES = process.env.JWT_EXPIRES || '1h';
 // Route to get all events
 router.get('/get-all', verifyIsLeader,  async (req: Request, res: Response) => {
   try {
-    const users = await User.findAll();
-    res.status(200).json(users);
+
+    const organizationId = req.user?.organizationId
+    const users = await User.findAll({
+      where: { organizationId } }
+    ) as any;
+
+    const mappedUsers = users.map(user => {
+    return {
+        id: user.id,
+        username: user.username,
+        isOrgLeader: user.isOrgLeader,
+      };
+    });
+    res.status(200).json(mappedUsers);
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
   }

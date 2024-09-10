@@ -3,11 +3,17 @@ import Answer from '../models/Answers';
 import Question from '../models/Questions';
 import AnswerChoice from '../models/AnswerChoices';
 import QuestionChoice from '../models/QuestionChoices';
+import User from '../models/Users';
 
 export function getCaseQueryConfig(): { attributes: string[], include: IncludeOptions[] } {
     return {
         attributes: ['id', 'approved'],
         include: [
+            {
+                model: User,
+                as: 'user',
+                attributes: ['id', 'username']
+            },
             {
                 model: Answer,
                 as: 'answers',
