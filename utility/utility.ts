@@ -97,17 +97,40 @@ export function sortCases(cases: any[], questionId: number, sortOrder: 'ASC' | '
 export function getSortValue(caseData: any, questionId: number): string | number {
     const answer = caseData.answers.find(ans => ans.question.id === questionId);
     if (answer) {
-        if (answer.question.type !== QuestionType.SelectOne && answer.question.type !== QuestionType.MultiSelect) {
-            if (answer.question.type === QuestionType.Scale) {
-                return +answer.answer || '';
-            }
-            return answer.answer || '';
+        if (answer.question.type === QuestionType.Scale) {
+            return +answer.answer || ''; // Handle numeric Scale type
         }
+
+        if (answer.question.type === QuestionType.Date) {
+            const dateValue = answer.answer;
+            return parseDate(dateValue); // Convert string to Date
+        }
+
         if (answer.question.type === QuestionType.SelectOne || answer.question.type === QuestionType.MultiSelect) {
             return answer.answerChoices.map(choice => choice.questionChoice.choice).join(', ') || '';
         }
+
+        // For other types, return the answer as is
+        return answer.answer || '';
     }
     return '';
+}
+
+function parseDate(dateString: string): number | string {
+    const isoDate = new Date(dateString);
+    if (!isNaN(isoDate.getTime())) {
+        return isoDate.getTime();
+    }
+
+    const customDatePattern = /^(\d{2})-(\d{2})-(\d{4})$/;
+    const match = customDatePattern.exec(dateString);
+    if (match) {
+        const [_, day, month, year] = match;
+        const customDate = new Date(`${year}-${month}-${day}`);
+        return customDate.getTime();
+    }
+
+    return dateString;
 }
 
 
