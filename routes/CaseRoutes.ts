@@ -218,7 +218,7 @@ router.get('/get-case/:caseId', authenticateToken, async (req: Request, res: Res
 
 router.post('/get-all-cases', verifyIsLeader, async (req: Request, res: Response) => {
     try {
-        const { page = 1, limit = 10, userId, sortField, sortOrder = 'ASC' } = req.body;
+        const { page = 1, limit = 10, userId, sortField, sortOrder = 'ASC', status } = req.body;
 
         const orgId = req.user?.organizationId
 
@@ -229,8 +229,13 @@ router.post('/get-all-cases', verifyIsLeader, async (req: Request, res: Response
         const whereClause: any = {
           organizationId: orgId
         };
+
         if (userId) {
             whereClause.userId = userId;
+        }
+
+        if (status) {
+            whereClause.approved = status;
         }
 
         let orderBy: any[] = [['id', 'DESC']];
