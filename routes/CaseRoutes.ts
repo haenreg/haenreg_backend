@@ -233,10 +233,18 @@ router.post('/get-all-cases', verifyIsLeader, async (req: Request, res: Response
             whereClause.userId = userId;
         }
 
+        let orderBy: any[] = [['id', 'DESC']];
+
+        if (sortField) {
+            const questionId = parseInt(sortField, 10);
+            orderBy = [];
+        }
+
         // Fetch cases with pagination and filtering
         const cases = await Case.findAndCountAll({
             where: whereClause,
             ...caseQueryConfig,
+            order: orderBy,
             limit,
             offset,
             distinct: true, // Ensures proper count when using include

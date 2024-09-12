@@ -4,6 +4,7 @@ import Question from '../models/Questions';
 import AnswerChoice from '../models/AnswerChoices';
 import QuestionChoice from '../models/QuestionChoices';
 import User from '../models/Users';
+import { QuestionType } from '../interfaces/iQuestion';
 
 export function getCaseQueryConfig(): { attributes: string[], include: IncludeOptions[] } {
     return {
@@ -93,17 +94,20 @@ export function sortCases(cases: any[], questionId: number, sortOrder: 'ASC' | '
     });
 }
 
-export function getSortValue(caseData: any, questionId: number): string {
+export function getSortValue(caseData: any, questionId: number): string | number {
     const answer = caseData.answers.find(ans => ans.question.id === questionId);
     if (answer) {
-        if (answer.question.type === 'TEXT' || answer.question.type === 'DATE') {
-            return answer.answer || ''; // Sort by the answer string for TEXT or DATE types
+        if (answer.question.type !== QuestionType.SelectOne && answer.question.type !== QuestionType.MultiSelect) {
+            if (answer.question.type === QuestionType.Scale) {
+                return +answer.answer || '';
+            }
+            return answer.answer || '';
         }
-        if (answer.question.type === 'SELECT_ONE' || answer.question.type === 'MULTI_SELECT') {
-            return answer.answerChoices.map(choice => choice.questionChoice.choice).join(', ') || ''; // Sort by the choices string
+        if (answer.question.type === QuestionType.SelectOne || answer.question.type === QuestionType.MultiSelect) {
+            return answer.answerChoices.map(choice => choice.questionChoice.choice).join(', ') || '';
         }
     }
-    return ''; // Default if no matching question found
+    return '';
 }
 
 
