@@ -269,7 +269,7 @@ router.post('/get-all-cases', verifyIsLeader, async (req: Request, res: Response
     }
 });
 
-router.put('/approve-case/:caseId', verifyIsLeader, async (req: Request, res: Response) => {
+router.get('/approve-case/:caseId', verifyIsLeader, async (req: Request, res: Response) => {
   try {
     const { caseId } = req.params;
 
@@ -293,7 +293,7 @@ router.put('/approve-case/:caseId', verifyIsLeader, async (req: Request, res: Re
   }
 });
 
-router.put('/disprove-case/:caseId', verifyIsLeader, async (req: Request, res: Response) => {
+router.get('/disprove-case/:caseId', verifyIsLeader, async (req: Request, res: Response) => {
   try {
     const { caseId } = req.params;
 

@@ -713,7 +713,7 @@ paths:
                     example: "An unexpected error occurred"
 
   /cases/approve-case/{caseId}:
-    put:
+    get:
       summary: Approve a case
       tags:
         - administration case
@@ -760,7 +760,7 @@ paths:
                     example: An unexpected error occurred
 
   /cases/disprove-case/{caseId}:
-    put:
+    get:
       summary: Disprove a case
       tags:
         - administration case
