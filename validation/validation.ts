@@ -43,10 +43,14 @@ export const createQuestionValidation = (data: CreateCaseData[]) => {
             type: Joi.string().required(),
             questionChoices: Joi.array().items(
                 Joi.object({
+                    id: Joi.number().optional(),
                     choice: Joi.string().required(),
-                    dependent: Joi.object({
-                        choice: Joi.string().required()
-                    })
+                    dependent: Joi.array().items(
+                        Joi.object({
+                            id: Joi.number().optional(),
+                            choice: Joi.string().required()
+                        })
+                    )
                 })
             )
         });
