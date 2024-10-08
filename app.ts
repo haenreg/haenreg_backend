@@ -21,7 +21,7 @@ const swaggerPath = path.join(__dirname, 'swagger.yaml');
 const swaggerFile = yaml.load(fs.readFileSync(swaggerPath, 'utf8'));
 
 const corsOptions = {
-  origin: ['http://localhost:4200', 'https://your-production-domain.com'], // Replace with your allowed origins
+  origin: ['http://localhost:4200'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 };
